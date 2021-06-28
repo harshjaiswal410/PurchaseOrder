@@ -1,0 +1,67 @@
+﻿@model PurchaseOrder.Models.ItemModel
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Edit Details</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    </head>
+    <body style="background-color:darkgrey">
+        <div class="col-md-4 container1">
+            @using (Html.BeginForm("EditDetails", "Purchase"))
+            {
+                <table class="table-dark">
+                    <tr>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Disc %</th>
+                        <th>Discount</th>
+                        <th>Total</th>
+                    </tr>
+                    <tr>
+                        <td>@Html.TextBoxFor(Qty => Qty.Qty, htmlAttributes: new { onChange = "onQuantityOrRateChange()", pattern = @"^\d*(\.\d{0,2})?$" })</td>
+                        <td>@Html.TextBoxFor(Rate => Rate.Rate, htmlAttributes: new { onChange = "onQuantityOrRateChange()", pattern = @"^\d*(\.\d{0,2})?$" })</td>
+                        <td>@Html.TextBoxFor(Amount => Amount.Amount, htmlAttributes: new { @readonly = "readonly" })</td>
+                        <td>@Html.TextBoxFor(DiscPercent => DiscPercent.DiscPercent, htmlAttributes: new { onChange = "onDiscountPerChange()", pattern = @"^\d*(\.\d{0,2})?$" })</td>
+                        <td>@Html.TextBoxFor(Discount => Discount.Discount, htmlAttributes: new { @readonly = "readonly" })</td>
+                        <td>@Html.TextBoxFor(Total => Total.Total, htmlAttributes: new { @readonly = "readonly" })</td>
+                    </tr>
+                </table>
+                <input class="btn btn-success" type="submit" value="Update">
+            }
+            <button class="btn btn-warning">
+                @Html.ActionLink("Back to table", "GetDetails/", "Purchase")
+            </button>
+        </div>
+        <script>
+            function onQuantityOrRateChange() {
+                var Quantity = document.getElementById("Qty").value;
+                var Rate = document.getElementById("Rate").value;
+                if (Quantity <= 0 && Quantity == null) {
+                    Quantity = 0;
+                }
+                if (Rate <= 0 && Rate == null) {
+                    Rate = 0;
+                }
+                var Amount = document.getElementById("Amount");
+                Amount.value = (Quantity * Rate).toFixed(2);
+            }
+
+            function onDiscountPerChange() {
+                var Amount = document.getElementById("Amount").value;
+                if (Amount <= 0 && Amount == null) {
+                    Amount = 0;
+                }
+                var DiscPercent = document.getElementById("DiscPercent").value;
+                if (DiscPercent <= 0 && DiscPercent == null) {
+                    DiscPercent = 0;
+                }
+                var Discount = document.getElementById("Discount");
+                Discount.value = ((Amount * DiscPercent) / 100).toFixed(2);
+                var Total = document.getElementById("Total");
+                Total.value = (Amount - Discount.value).toFixed(2);
+
+            }
+        </script>
+    </body>
+</html>

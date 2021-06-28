@@ -1,0 +1,160 @@
+﻿@model PurchaseOrder.Models.ItemModel
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Product</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body{
+                background-color:darkgrey;
+            }
+            tr.col-sm-5 input {
+                width: 150px;
+            }
+            .Purchase {
+                width:50%;
+                background-color: #343a40;
+                color:white;
+                margin-left: 16px;
+                margin-bottom:10px;
+                padding:10px;
+                text-align:center;
+            }
+            .row{
+                margin-left:10px;
+                margin-top:10px;
+            }
+            select#PartyNameList {
+                width: 146px;
+                height: 29px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+
+            <div class="Purchase">
+                <h2>Purchase Order</h2>
+                <div class="row">
+                    <div>
+                        <label>Po No.</label>
+                        @Html.TextBoxFor(PoNo => PoNo.PO_No)
+                    </div>
+                    <div style=" margin-left: 90px;">
+                        <label>Po Date</label>
+                        @Html.TextBoxFor(PoDate => PoDate.PO_Date)
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label>Party Name</label>
+                        @Html.DropDownListFor(PartyName => PartyName.PartyNameList, new SelectList(Model.PartyNameList, "PartyID", "PartyName"), "PartyName")
+                    </div>
+                    <div style=" margin-left:93px;">
+                        <label>Remark</label>
+                        @Html.TextBoxFor(Remark => Remark.Remarks)
+                    </div>
+                </div>
+            </div>
+            <div>
+                @using (Html.BeginForm("InsertDetails", "Purchase"))
+                {
+                    <div class="col-lg-6">
+                        <table class="table table-dark ">
+                            <tr class="col-sm-5">
+                                <th>Item name</th>
+                                <th>Details ID</th>
+                                <th>Qty</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th>Disc %</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                            </tr>
+                            <tr class="col-sm-5">
+                                <td>@Html.TextBoxFor(ItemName => ItemName.ItemName)</td>
+                                <td>@Html.TextBoxFor(Details => Details.DetailsID)</td>
+                                <td>@Html.TextBoxFor(Qty => Qty.Qty, htmlAttributes: new { onChange = "onQuantityOrRateChange()", pattern = @"^\d*(\.\d{0,2})?$" })</td>
+                                <td>@Html.TextBoxFor(Rate => Rate.Rate, htmlAttributes: new { onChange = "onQuantityOrRateChange()", pattern = @"^\d*(\.\d{0,2})?$" })</td>
+                                <td>@Html.TextBoxFor(Amount => Amount.Amount, htmlAttributes: new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBoxFor(DiscPercent => DiscPercent.DiscPercent, htmlAttributes: new { onChange = "onDiscountPerChange()", pattern = @"^\d*(\.\d{0,2})?$" })</td>
+                                <td>@Html.TextBoxFor(Discount => Discount.Discount, htmlAttributes: new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBoxFor(Total => Total.Total, htmlAttributes: new { @readonly = "readonly" })</td>
+                            </tr>
+                        </table>
+                        <input class="btn btn-success" type="submit" value="Add">
+                    </div>
+                }
+            </div>
+            <div class="col-lg-12 container2">
+                <table class="table table-dark">
+                    <tr>
+                        <th>ItemList</th>
+                        <th>Details ID</th>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Disc %</th>
+                        <th>Discount</th>
+                        <th>Total</th>
+                        <th>Action</th>
+
+                    </tr>
+                    @foreach (var item in @Model.ItemList)
+                    {
+                        <tr class="info">
+                            <td>
+                                @Html.DropDownListFor(NameList => NameList.NameList, new SelectList(Model.NameList, "ItemId", "ItemName"), "Item Name")
+                            </td>
+                            <td>@Html.DisplayFor(modelitem => item.DetailsID) </td>
+                            <td>@Html.DisplayFor(modelitem => item.Qty)</td>
+                            <td>@Html.DisplayFor(modelitem => item.Rate)</td>
+                            <td>@Html.DisplayFor(modelitem => item.Amount)</td>
+                            <td>@Html.DisplayFor(modelitem => item.DiscPercent)</td>
+                            <td>@Html.DisplayFor(modelitem => item.Discount)</td>
+                            <td>@Html.DisplayFor(modelitem => item.Total)</td>
+
+                            <td>
+                                <button class="btn btn-default">
+                                    @Html.ActionLink("Edit", "EditDetails/" + item.DetailsID, "Purchase")
+                                </button>
+                                <button class="btn btn-danger">
+                                    @Html.ActionLink("DELETE", "DeleteDetails/" + item.DetailsID, "Purchase")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+        <script>
+            function onQuantityOrRateChange() {
+                var Quantity = document.getElementById("Qty").value;
+                var Rate = document.getElementById("Rate").value;
+                if (Quantity <= 0 && Quantity == null) {
+                    Quantity = 0;
+                }
+                if (Rate <= 0 && Rate == null) {
+                    Rate = 0;
+                }
+                var Amount = document.getElementById("Amount");
+                Amount.value = (Quantity * Rate).toFixed(2);
+            }
+
+            function onDiscountPerChange() {
+                var Amount = document.getElementById("Amount").value;
+                if (Amount <= 0 && Amount == null) {
+                    Amount = 0;
+                }
+                var DiscPercent = document.getElementById("DiscPercent").value;
+                if (DiscPercent <= 0 && DiscPercent == null) {
+                    DiscPercent = 0;
+                }
+                var Discount = document.getElementById("Discount");
+                Discount.value = ((Amount * DiscPercent) / 100).toFixed(2);
+                var Total = document.getElementById("Total");
+                Total.value = (Amount - Discount.value).toFixed(2);
+
+            }
+        </script>
+    </body>
+</html>
